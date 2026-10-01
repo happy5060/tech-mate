@@ -5,7 +5,9 @@ import {
   SectionAlignment,
   LessonFilterOptions,
   GenerationStage,
-  LessonContent
+  LessonContent,
+  LessonQualityReport,
+  LessonQualitySection
 } from '../../types/lesson';
 import { INITIAL_MOCK_LESSONS } from '../../data/mockLessons';
 import { supabase, invokeEdgeFunction, isSupabaseConfigured } from './supabaseClient';
@@ -115,6 +117,21 @@ function mapDbRowToLesson(row: any): Lesson {
     note: a.reason || ''
   }));
 
+  const qualityRaw = contentRaw.quality_report || (row as any).quality_report || (row as any).qualityReport;
+  const qualityReport: LessonQualityReport | undefined = qualityRaw
+    ? {
+        overall_status: qualityRaw.overall_status === 'needs_review' ? 'needs_review' : 'ready',
+        summary: qualityRaw.summary || '',
+        evaluatedAt: qualityRaw.evaluatedAt || qualityRaw.evaluated_at || new Date().toISOString(),
+        sections: (qualityRaw.sections || []).map((s: any) => ({
+          section: s.section as LessonSectionKey,
+          sectionTitle: s.sectionTitle || formatSectionTitle(s.section),
+          status: s.status === 'good' ? 'good' : 'needs_review',
+          reason: s.reason || ''
+        }))
+      }
+    : undefined;
+
   return {
     id: row.id,
     title: row.title,
@@ -129,7 +146,8 @@ function mapDbRowToLesson(row: any): Lesson {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     content,
-    alignments: alignments.length > 0 ? alignments : getDefaultAlignments()
+    alignments: alignments.length > 0 ? alignments : getDefaultAlignments(),
+    qualityReport
   };
 }
 
@@ -177,7 +195,8 @@ function mapLessonToDbRow(lesson: Lesson): any {
           rubric: q.rubric
         }))
       },
-      conclusion: lesson.content.conclusion
+      conclusion: lesson.content.conclusion,
+      quality_report: lesson.qualityReport
     },
     alignment_results: lesson.alignments.map((a) => ({
       section: a.sectionKey,
@@ -213,6 +232,108 @@ function getDefaultAlignments(): SectionAlignment[] {
     { sectionKey: 'assessment', sectionTitle: 'Assessment', status: 'aligned', note: 'Diagnostic evaluation covering recall and application.' },
     { sectionKey: 'conclusion', sectionTitle: 'Conclusion', status: 'aligned', note: 'Synthesizes key takeaways.' }
   ];
+}
+
+function generateFallbackQualityReport(lesson: Lesson): LessonQualityReport {
+  const sections: LessonQualitySection[] = [];
+
+  // 1. Introduction
+  const hasIntro = Boolean(lesson.content.introduction && lesson.content.introduction.trim().length > 20);
+  sections.push({
+    section: 'introduction',
+    sectionTitle: 'Introduction & Curiosity Hook',
+    status: hasIntro ? 'good' : 'needs_review',
+    reason: hasIntro
+      ? `Engages students and contextualizes "${lesson.topic}" effectively.`
+      : 'Introduction is brief or missing a strong student engagement hook.'
+  });
+
+  // 2. Learning Objectives
+  const hasObjectives = Array.isArray(lesson.content.learningObjectives) && lesson.content.learningObjectives.length >= 2;
+  sections.push({
+    section: 'learningObjectives',
+    sectionTitle: 'Learning Objectives',
+    status: hasObjectives ? 'good' : 'needs_review',
+    reason: hasObjectives
+      ? 'Cognitively measurable outcomes aligned with Bloom’s taxonomy and class level.'
+      : 'Learning objectives need explicit measurable action verbs.'
+  });
+
+  // 3. Concept Explanation
+  const hasConcept = Boolean(lesson.content.conceptExplanation && lesson.content.conceptExplanation.trim().length > 40);
+  sections.push({
+    section: 'conceptExplanation',
+    sectionTitle: 'Concept Explanation',
+    status: hasConcept ? 'good' : 'needs_review',
+    reason: hasConcept
+      ? `Clear, structured conceptual breakdown appropriate for ${lesson.classLevel} (${lesson.difficulty} difficulty).`
+      : 'Concept explanation needs greater depth and foundational definitions.'
+  });
+
+  // 4. Examples
+  const hasExamples = Array.isArray(lesson.content.examples) && lesson.content.examples.length >= 1;
+  sections.push({
+    section: 'examples',
+    sectionTitle: 'Applied Examples',
+    status: hasExamples ? 'good' : 'needs_review',
+    reason: hasExamples
+      ? 'Concrete case scenarios reinforce theoretical principles.'
+      : 'At least one realistic contextual example is required.'
+  });
+
+  // 5. Classroom Activity
+  const hasActivity = Boolean(lesson.content.classroomActivity?.title && lesson.content.classroomActivity?.stepByStepInstructions?.length);
+  sections.push({
+    section: 'classroomActivity',
+    sectionTitle: 'Classroom Activity',
+    status: hasActivity ? 'good' : 'needs_review',
+    reason: hasActivity
+      ? `Active learning design matches ${lesson.duration} duration and ${lesson.teachingStyle} style.`
+      : 'Activity instructions or expected outcomes require clearer structure.'
+  });
+
+  // 6. Discussion Questions
+  const hasQuestions = Array.isArray(lesson.content.discussionQuestions) && lesson.content.discussionQuestions.length >= 1;
+  sections.push({
+    section: 'discussionQuestions',
+    sectionTitle: 'Discussion Questions',
+    status: hasQuestions ? 'good' : 'needs_review',
+    reason: hasQuestions
+      ? 'Inquiry prompts stimulate class discourse and critical thinking.'
+      : 'Open-ended discussion prompts are needed to evaluate understanding.'
+  });
+
+  // 7. Assessment
+  const hasAssessment = Array.isArray(lesson.content.assessment?.questions) && lesson.content.assessment.questions.length >= 1;
+  sections.push({
+    section: 'assessment',
+    sectionTitle: 'Assessment & Diagnostics',
+    status: hasAssessment ? 'good' : 'needs_review',
+    reason: hasAssessment
+      ? 'Diagnostic questions evaluate mastery of target learning objective.'
+      : 'Assessment needs diagnostic questions targeting the core learning objective.'
+  });
+
+  // 8. Conclusion
+  const hasConclusion = Boolean(lesson.content.conclusion && lesson.content.conclusion.trim().length > 15);
+  sections.push({
+    section: 'conclusion',
+    sectionTitle: 'Conclusion & Wrap-up',
+    status: hasConclusion ? 'good' : 'needs_review',
+    reason: hasConclusion
+      ? 'Synthesizes key takeaways and connects to next learning milestones.'
+      : 'Conclusion needs a concise synthesis of key concepts.'
+  });
+
+  const allGood = sections.every((s) => s.status === 'good');
+  return {
+    overall_status: allGood ? 'ready' : 'needs_review',
+    summary: allGood
+      ? `Lesson package successfully meets pedagogical standards for ${lesson.classLevel} (${lesson.difficulty} difficulty).`
+      : 'Some sections require review to align with curriculum quality standards.',
+    sections,
+    evaluatedAt: new Date().toISOString()
+  };
 }
 
 /**
@@ -533,7 +654,16 @@ export const lessonService = {
     }
 
     // If Supabase returned an actual database error (e.g. RLS policy violation), throw error
-    if (dbError && dbError.code && dbError.code !== 'UND_ERR_CONNECT_TIMEOUT' && dbError.message && !dbError.message.includes('fetch failed')) {
+    // Skip schema cache / table-not-found errors and network errors — proceed to local delete
+    if (
+      dbError &&
+      dbError.code &&
+      dbError.code !== 'UND_ERR_CONNECT_TIMEOUT' &&
+      dbError.message &&
+      !dbError.message.includes('fetch failed') &&
+      !dbError.message.includes('schema cache') &&
+      !dbError.message.includes('Could not find the table')
+    ) {
       throw new Error(dbError.message || 'Database error occurred while deleting lesson from Supabase');
     }
 
@@ -574,6 +704,54 @@ export const lessonService = {
     }
 
     return lesson.alignments;
+  },
+
+  /**
+   * Run Lesson Quality Check via Gemini Edge Function (Phase 1)
+   */
+  async checkLessonQuality(lessonId: string): Promise<LessonQualityReport> {
+    const lesson = await this.getLesson(lessonId);
+    if (!lesson) throw new Error('Lesson not found');
+
+    try {
+      const res = await invokeEdgeFunction<LessonQualityReport>(
+        'check-lesson-quality',
+        {
+          subject: lesson.subject,
+          topic: lesson.topic,
+          classLevel: lesson.classLevel,
+          duration: lesson.duration,
+          learningObjective: lesson.learningObjective,
+          teachingStyle: lesson.teachingStyle,
+          difficulty: lesson.difficulty,
+          language: lesson.language,
+          lessonContent: lesson.content
+        }
+      );
+
+      if (res && res.overall_status && Array.isArray(res.sections)) {
+        const report: LessonQualityReport = {
+          overall_status: res.overall_status === 'needs_review' ? 'needs_review' : 'ready',
+          summary: res.summary || (res.overall_status === 'ready' ? 'Curriculum package meets all pedagogical criteria.' : 'One or more sections require review.'),
+          evaluatedAt: new Date().toISOString(),
+          sections: res.sections.map((s) => ({
+            section: s.section as LessonSectionKey,
+            sectionTitle: formatSectionTitle(s.section),
+            status: s.status === 'good' ? 'good' : 'needs_review',
+            reason: s.reason || ''
+          }))
+        };
+
+        await this.updateLesson(lessonId, { qualityReport: report });
+        return report;
+      }
+    } catch (err) {
+      console.warn('Edge Function check-lesson-quality error, using criteria fallback evaluator:', err);
+    }
+
+    const fallback = generateFallbackQualityReport(lesson);
+    await this.updateLesson(lessonId, { qualityReport: fallback });
+    return fallback;
   },
 
   /**

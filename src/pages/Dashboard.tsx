@@ -74,7 +74,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ dataVersion }) => {
         <div className="relative z-10 max-w-3xl space-y-5">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-indigo-200 border border-white/15 text-xs font-semibold backdrop-blur-md shadow-subtle">
             <Sparkles className="w-3.5 h-3.5 text-indigo-300" />
-            <span>AI Classroom Creator · Pedagogical Assistant</span>
+            <span>TechMate · Pedagogical Assistant</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.15]">

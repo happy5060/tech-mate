@@ -3,6 +3,9 @@ import dns from 'node:dns';
 import { handleGenerateLesson } from '../supabase/functions/generate-lesson/index';
 import { handleRegenerateSection } from '../supabase/functions/regenerate-section/index';
 import { handleCheckAlignment } from '../supabase/functions/check-alignment/index';
+import { handleCheckLessonQuality } from '../supabase/functions/check-lesson-quality/index';
+import { handleLessonChat } from '../supabase/functions/lesson-chat/index';
+import { handleAnalyzeVideo } from '../supabase/functions/analyze-video/index';
 
 try {
   dns.setDefaultResultOrder('ipv4first');
@@ -79,6 +82,26 @@ export function edgeFunctionsMiddleware() {
     if (url.includes('/functions/v1/check-alignment') || url.includes('/api/check-alignment')) {
       const webReq = await nodeToWebRequest(req);
       const webRes = await handleCheckAlignment(webReq);
+      return webToNodeResponse(webRes, res);
+    }
+
+    if (url.includes('/functions/v1/check-lesson-quality') || url.includes('/api/check-lesson-quality')) {
+      const webReq = await nodeToWebRequest(req);
+      const webRes = await handleCheckLessonQuality(webReq);
+      return webToNodeResponse(webRes, res);
+    }
+
+    if (url.includes('/functions/v1/lesson-chat') || url.includes('/api/lesson-chat')) {
+      const webReq = await nodeToWebRequest(req);
+      const webRes = await handleLessonChat(webReq);
+      return webToNodeResponse(webRes, res);
+    }
+
+
+
+    if (url.includes('/functions/v1/analyze-video') || url.includes('/api/analyze-video')) {
+      const webReq = await nodeToWebRequest(req);
+      const webRes = await handleAnalyzeVideo(webReq);
       return webToNodeResponse(webRes, res);
     }
 

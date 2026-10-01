@@ -314,6 +314,38 @@ async function runAllTests() {
     assert(false, `Rate limit test failed: ${err.message}`);
   }
 
+  // --------------------------------------------------------------------------
+  // TEST 15: Phase 1 — AI Lesson Quality Check
+  // --------------------------------------------------------------------------
+  console.log('\n--- 15. Testing AI Lesson Quality Check (check-lesson-quality) ---');
+  try {
+    const qualityRes = await fetch(`${BASE_URL}/functions/v1/check-lesson-quality`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subject: 'Biology',
+        topic: 'Cellular Mitosis & Cell Division Cycle',
+        classLevel: 'Grade 9',
+        duration: '45 min',
+        learningObjective: 'Students will describe the four phases of mitosis and explain why identical chromosome segregation is vital.',
+        teachingStyle: 'Interactive',
+        difficulty: 'Medium',
+        lessonContent: generatedLesson
+      })
+    });
+
+    assert(qualityRes.status === 200, 'check-lesson-quality endpoint responded with HTTP 200');
+    const qualityData = await qualityRes.json();
+    assert(qualityData.overall_status === 'ready' || qualityData.overall_status === 'needs_review', 'Quality report has valid binary overall_status (ready or needs_review)');
+    assert(Array.isArray(qualityData.sections) && qualityData.sections.length >= 8, 'Quality report evaluates all 8 curriculum modules');
+    const allHaveStatus = qualityData.sections.every((s) => s.status === 'good' || s.status === 'needs_review');
+    assert(allHaveStatus, 'Every evaluated section has strictly "good" or "needs_review" status (no arbitrary percentages)');
+    const allHaveReasons = qualityData.sections.every((s) => typeof s.reason === 'string' && s.reason.length > 0);
+    assert(allHaveReasons, 'Every evaluated section provides an actionable pedagogical explanation');
+  } catch (err) {
+    assert(false, `check-lesson-quality test failed: ${err.message}`);
+  }
+
   console.log('\n====================================================');
   console.log(`TEST RESULTS: ${passedCount} PASSED | ${failedCount} FAILED`);
   console.log('====================================================\n');

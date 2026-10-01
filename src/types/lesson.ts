@@ -78,6 +78,22 @@ export interface LessonContent {
   conclusion: string;
 }
 
+export type QualityStatus = 'good' | 'needs_review';
+
+export interface LessonQualitySection {
+  section: LessonSectionKey;
+  sectionTitle?: string;
+  status: QualityStatus;
+  reason: string;
+}
+
+export interface LessonQualityReport {
+  overall_status: 'ready' | 'needs_review';
+  summary?: string;
+  sections: LessonQualitySection[];
+  evaluatedAt?: string;
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -93,6 +109,7 @@ export interface Lesson {
   updatedAt: string;
   content: LessonContent;
   alignments: SectionAlignment[];
+  qualityReport?: LessonQualityReport;
 }
 
 export interface CreateLessonFormData {

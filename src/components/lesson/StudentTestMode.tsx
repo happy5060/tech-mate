@@ -24,13 +24,17 @@ export type TestState = 'not_started' | 'in_progress' | 'submitted' | 'review';
 interface StudentTestModeProps {
   questions: AssessmentQuestion[];
   instructions?: string;
-  onExit: () => void;
+  onExit?: () => void;
+  onComplete?: (score: number, maxScore: number) => void;
+  onActiveChange?: (active: boolean) => void;
 }
 
 export const StudentTestMode: React.FC<StudentTestModeProps> = ({
   questions,
   instructions,
-  onExit
+  onExit,
+  onComplete,
+  onActiveChange
 }) => {
   // Test State: 'in_progress' | 'submitted' | 'review'
   const [testState, setTestState] = useState<TestState>('in_progress');
@@ -101,7 +105,16 @@ export const StudentTestMode: React.FC<StudentTestModeProps> = ({
   const finalizeSubmit = () => {
     setShowUnansweredWarning(false);
     setTestState('submitted');
+    if (onComplete) {
+      onComplete(correctGradableCount, gradableQuestions.length);
+    }
   };
+
+  React.useEffect(() => {
+    if (onActiveChange) {
+      onActiveChange(testState === 'in_progress');
+    }
+  }, [testState, onActiveChange]);
 
   // Retake test handler: resets answers, resets score, resets to question 1
   const handleRetake = () => {
@@ -171,15 +184,17 @@ export const StudentTestMode: React.FC<StudentTestModeProps> = ({
               Retake Test
             </Button>
           )}
-          <Button
-            variant="glass"
-            size="sm"
-            onClick={onExit}
-            leftIcon={<ArrowLeft className="w-3.5 h-3.5" />}
-            className="rounded-xl border-slate-200/70 text-slate-600 hover:text-slate-900"
-          >
-            Exit Test Mode
-          </Button>
+          {onExit && (
+            <Button
+              variant="glass"
+              size="sm"
+              onClick={onExit}
+              leftIcon={<ArrowLeft className="w-3.5 h-3.5" />}
+              className="rounded-xl border-slate-200/70 text-slate-600 hover:text-slate-900"
+            >
+              Exit Test Mode
+            </Button>
+          )}
         </div>
       </div>
 

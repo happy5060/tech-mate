@@ -14,6 +14,10 @@ import { Button } from '../components/ui/Button';
 import { SectionCard } from '../components/lesson/SectionCard';
 import { AssessmentSection } from '../components/lesson/AssessmentSection';
 import { AlignmentPanel } from '../components/lesson/AlignmentPanel';
+import { LessonQualityModal, LessonQualityCard } from '../components/lesson/LessonQualityModal';
+import { LessonResourcesPanel } from '../components/resources/LessonResourcesPanel';
+import { LessonAssistant } from '../components/chat/LessonAssistant';
+import { PublishLessonModal } from '../components/classroom/PublishLessonModal';
 import {
   ArrowLeft,
   Save,
@@ -33,7 +37,10 @@ import {
   Sparkles,
   Plus,
   Trash2,
-  Share2
+  Share2,
+  ShieldCheck,
+  Bot,
+  Send
 } from 'lucide-react';
 
 interface LessonWorkspaceProps {
@@ -50,6 +57,16 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
   const [lastSaved, setLastSaved] = useState<string | null>(null);
   const [regeneratingSection, setRegeneratingSection] = useState<LessonSectionKey | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Lesson Quality Check state (Phase 1)
+  const [isQualityModalOpen, setIsQualityModalOpen] = useState(false);
+  const [isCheckingQuality, setIsCheckingQuality] = useState(false);
+
+  // Lesson-Aware AI Assistant state (Phase 2 & 15)
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+
+  // Publishing state (Phase 8 & 9)
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 
   // Per-section editing state
   const [activeEditingSection, setActiveEditingSection] = useState<LessonSectionKey | null>(null);
@@ -111,6 +128,34 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
     if (!lesson) return;
     lessonService.exportLesson(lesson.id, 'json');
     showToast('Exported lesson package JSON');
+  };
+
+  // Phase 1: AI Lesson Quality Check handler
+  const handleRunQualityCheck = async () => {
+    if (!lesson) return;
+    setIsCheckingQuality(true);
+    try {
+      const report = await lessonService.checkLessonQuality(lesson.id);
+      setLesson((prev) => (prev ? { ...prev, qualityReport: report } : null));
+      showToast(
+        report.overall_status === 'ready'
+          ? 'Quality Check: Lesson is Ready to Teach!'
+          : 'Quality Check: Review recommended for flagged sections'
+      );
+      if (onLessonUpdated) onLessonUpdated();
+    } catch (err: any) {
+      console.error('Quality check error:', err);
+      showToast('Quality check failed: ' + (err.message || 'Error'));
+    } finally {
+      setIsCheckingQuality(false);
+    }
+  };
+
+  const handleOpenQualityModal = () => {
+    setIsQualityModalOpen(true);
+    if (!lesson?.qualityReport) {
+      handleRunQualityCheck();
+    }
   };
 
   // Section-specific regenerate action
@@ -241,6 +286,54 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
                 View
               </Button>
             </Link>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleOpenQualityModal}
+              isLoading={isCheckingQuality}
+              leftIcon={<ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />}
+              title="Audit lesson against 10 pedagogical standards"
+              className={`bg-white/80 hover:bg-white border shadow-xs transition-all ${
+                lesson.qualityReport?.overall_status === 'ready'
+                  ? 'border-emerald-300 text-emerald-800 hover:border-emerald-400'
+                  : lesson.qualityReport?.overall_status === 'needs_review'
+                  ? 'border-amber-300 text-amber-800 hover:border-amber-400'
+                  : 'border-slate-200/80 text-slate-700'
+              }`}
+            >
+              <span>Check Lesson</span>
+              {lesson.qualityReport && (
+                <span
+                  className={`w-2 h-2 rounded-full ring-2 ring-white ${
+                    lesson.qualityReport.overall_status === 'ready' ? 'bg-emerald-500' : 'bg-amber-500'
+                  }`}
+                  title={lesson.qualityReport.overall_status === 'ready' ? 'Ready to Teach' : 'Needs Review'}
+                />
+              )}
+            </Button>
+
+            {/* Phase 2: Ask AI */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsAssistantOpen(true)}
+              leftIcon={<Bot className="w-3.5 h-3.5 text-indigo-600" />}
+              className="bg-white/80 hover:bg-white border-slate-200/80 text-slate-700 shadow-xs"
+            >
+              Ask AI
+            </Button>
+
+            {/* Phase 8: Publish to Students */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsPublishModalOpen(true)}
+              leftIcon={<Send className="w-3.5 h-3.5 text-indigo-600" />}
+              className="bg-white/80 hover:bg-white border-indigo-200 text-indigo-700 font-semibold shadow-xs"
+            >
+              Publish to Students
+            </Button>
 
             <div className="relative group">
               <Button
@@ -887,12 +980,28 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
               {lesson.content.conclusion}
             </p>
           </SectionCard>
+
+          {/* Learning Resources & Videos (Manual Teacher Selection) */}
+          <LessonResourcesPanel
+            lessonId={lesson.id}
+            topic={lesson.topic}
+            subject={lesson.subject}
+            classLevel={lesson.classLevel}
+            learningObjective={lesson.learningObjective}
+          />
         </div>
 
         {/* Right Column: Learning Objective Alignment & Table of Contents */}
         <div className="lg:col-span-4 space-y-6 no-print">
           {/* Dedicated Learning Objective Alignment Panel */}
           <div className="sticky top-40 space-y-6">
+            {/* AI Curriculum Quality Check Card (Phase 1) */}
+            <LessonQualityCard
+              report={lesson.qualityReport}
+              isLoading={isCheckingQuality}
+              onOpenCheck={handleOpenQualityModal}
+            />
+
             <AlignmentPanel
               lessonId={lesson.id}
               initialAlignments={lesson.alignments}
@@ -939,6 +1048,45 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
           <span>{toastMessage}</span>
         </div>
       )}
+
+      {/* AI Lesson Quality Modal (Phase 1) */}
+      <LessonQualityModal
+        isOpen={isQualityModalOpen}
+        onClose={() => setIsQualityModalOpen(false)}
+        report={lesson.qualityReport || null}
+        isLoading={isCheckingQuality}
+        onRunCheck={handleRunQualityCheck}
+        onRegenerateSection={handleRegenerate}
+        regeneratingSection={regeneratingSection}
+        onJumpToSection={scrollToSection}
+      />
+
+      {/* Lesson-Aware AI Assistant (Phase 2 & Phase 15) */}
+      <LessonAssistant
+        isOpen={isAssistantOpen}
+        onClose={() => setIsAssistantOpen(false)}
+        lessonContext={{
+          subject: lesson.subject,
+          topic: lesson.topic,
+          classLevel: lesson.classLevel,
+          learningObjective: lesson.learningObjective,
+          lessonContent: lesson.content
+        }}
+        isTestActive={false}
+        isStudent={false}
+        title="Curriculum AI Co-Pilot"
+      />
+
+      {/* Publish Lesson Modal (Phase 8 & 9) */}
+      <PublishLessonModal
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        lesson={lesson}
+        onPublished={() => {
+          showToast('Lesson published to classroom cohort successfully');
+          if (onLessonUpdated) onLessonUpdated();
+        }}
+      />
     </div>
   );
 };

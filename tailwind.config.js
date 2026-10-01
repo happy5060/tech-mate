@@ -28,10 +28,16 @@ export default {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       boxShadow: {
-        'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
-        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.04)',
-        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.05)',
-        'modal': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+        'card': '0 4px 12px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02)',
+        'card-hover': '0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.03)',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.06), 0 1px 2px 0 rgba(255, 255, 255, 0.6) inset',
+        'glass-hover': '0 12px 36px 0 rgba(31, 38, 135, 0.1), 0 1px 2px 0 rgba(255, 255, 255, 0.8) inset',
+        'glow': '0 0 20px -3px rgba(99, 102, 241, 0.3)',
+        'modal': '0 25px 50px -12px rgba(15, 23, 42, 0.18)',
+      },
+      backdropBlur: {
+        xs: '2px',
       }
     },
   },

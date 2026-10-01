@@ -1,7 +1,12 @@
 import type { IncomingMessage, ServerResponse } from 'http';
+import dns from 'node:dns';
 import { handleGenerateLesson } from '../supabase/functions/generate-lesson/index';
 import { handleRegenerateSection } from '../supabase/functions/regenerate-section/index';
 import { handleCheckAlignment } from '../supabase/functions/check-alignment/index';
+
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch {}
 
 /**
  * Converts Node IncomingMessage to Web Standard Request

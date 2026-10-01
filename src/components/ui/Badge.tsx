@@ -14,17 +14,17 @@ export const Badge: React.FC<BadgeProps> = ({
   className = ''
 }) => {
   const variantStyles = {
-    brand: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    warning: 'bg-amber-50 text-amber-800 border-amber-200',
-    neutral: 'bg-slate-100 text-slate-700 border-slate-200',
-    outline: 'bg-transparent text-slate-600 border-slate-300',
-    purple: 'bg-purple-50 text-purple-700 border-purple-200',
+    brand: 'bg-indigo-50/80 text-indigo-700 border-indigo-200/70 shadow-sm backdrop-blur-xs',
+    success: 'bg-emerald-50/80 text-emerald-800 border-emerald-200/70 shadow-sm backdrop-blur-xs',
+    warning: 'bg-amber-50/80 text-amber-900 border-amber-200/70 shadow-sm backdrop-blur-xs',
+    neutral: 'bg-slate-100/80 text-slate-700 border-slate-200/70 shadow-sm backdrop-blur-xs',
+    outline: 'bg-white/40 text-slate-600 border-slate-200 backdrop-blur-xs',
+    purple: 'bg-purple-50/80 text-purple-700 border-purple-200/70 shadow-sm backdrop-blur-xs',
   };
 
   const sizeStyles = {
-    sm: 'text-xs px-2 py-0.5 font-medium',
-    md: 'text-xs sm:text-sm px-2.5 py-1 font-medium',
+    sm: 'text-[11px] px-2.5 py-0.5 font-medium tracking-tight',
+    md: 'text-xs sm:text-[13px] px-3 py-1 font-medium tracking-tight',
   };
 
   return (

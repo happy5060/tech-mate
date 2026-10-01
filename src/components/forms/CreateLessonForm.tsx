@@ -9,14 +9,11 @@ import {
 import {
   Sparkles,
   BookOpen,
-  Clock,
-  GraduationCap,
   Layers,
-  Globe,
-  HelpCircle,
   FileCheck2,
   CheckCircle2,
-  Wand2
+  Wand2,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 
@@ -182,31 +179,33 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Quick Sample Presets */}
-      <div className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+      {/* Quick Sample Presets Bar with Translucent Surface */}
+      <div className="glass-panel rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-xs font-semibold text-indigo-900">
-          <Wand2 className="w-4 h-4 text-indigo-600" />
-          <span>Quick Demo Presets:</span>
+          <div className="p-1.5 bg-indigo-100/70 text-indigo-700 rounded-lg">
+            <Wand2 className="w-4 h-4" />
+          </div>
+          <span>Curriculum Presets:</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => fillSampleData('science')}
-            className="px-2.5 py-1 text-xs font-medium rounded-md bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 shadow-subtle transition-colors"
+            className="px-3 py-1.5 text-xs font-medium rounded-xl bg-white/90 border border-indigo-200/70 text-indigo-700 hover:bg-indigo-50 shadow-subtle hover:shadow-sm transition-all"
           >
             Faraday's Law (Physics)
           </button>
           <button
             type="button"
             onClick={() => fillSampleData('cs')}
-            className="px-2.5 py-1 text-xs font-medium rounded-md bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 shadow-subtle transition-colors"
+            className="px-3 py-1.5 text-xs font-medium rounded-xl bg-white/90 border border-indigo-200/70 text-indigo-700 hover:bg-indigo-50 shadow-subtle hover:shadow-sm transition-all"
           >
             Binary Search (CS)
           </button>
           <button
             type="button"
             onClick={() => fillSampleData('math')}
-            className="px-2.5 py-1 text-xs font-medium rounded-md bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 shadow-subtle transition-colors"
+            className="px-3 py-1.5 text-xs font-medium rounded-xl bg-white/90 border border-indigo-200/70 text-indigo-700 hover:bg-indigo-50 shadow-subtle hover:shadow-sm transition-all"
           >
             Pythagoras (Math)
           </button>
@@ -217,18 +216,25 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
         {/* Left 2 Cols: Form Inputs */}
         <div className="lg:col-span-2 space-y-6">
           {/* Card: Core Details */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-5">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <BookOpen className="w-4 h-4 text-indigo-600" />
-              <h3 className="text-sm font-bold text-slate-900">
-                1. Subject & Target Audience
-              </h3>
+          <div className="glass-panel rounded-3xl p-6 sm:p-7 space-y-5">
+            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200/70">
+              <div className="p-2 bg-indigo-50 rounded-xl text-indigo-700 shadow-subtle">
+                <BookOpen className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+                  1. Subject & Target Audience
+                </h3>
+                <p className="text-[11px] text-slate-500 font-medium">
+                  Establish domain, topic, and grade parameters
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Subject */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Subject <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
@@ -239,11 +245,11 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
                     value={formData.subject}
                     onChange={(e) => handleChange('subject', e.target.value)}
                     onBlur={() => handleBlur('subject')}
-                    className={`w-full text-xs sm:text-sm p-2.5 rounded-lg border ${
+                    className={`w-full text-xs sm:text-sm p-3 rounded-xl glass-input ${
                       errors.subject && touched.subject
-                        ? 'border-rose-400 bg-rose-50/30'
-                        : 'border-slate-300'
-                    } focus:ring-2 focus:ring-indigo-500 focus:outline-none`}
+                        ? 'border-rose-400 bg-rose-50/40 focus:ring-rose-400'
+                        : ''
+                    } focus:outline-none`}
                   />
                   <datalist id="subject-suggestions">
                     {COMMON_SUBJECTS.map((s) => (
@@ -252,22 +258,23 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
                   </datalist>
                 </div>
                 {errors.subject && touched.subject && (
-                  <p className="mt-1 text-[11px] text-rose-600 font-medium">
-                    {errors.subject}
+                  <p className="mt-1.5 text-[11px] text-rose-600 font-medium flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    <span>{errors.subject}</span>
                   </p>
                 )}
               </div>
 
               {/* Class Level */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Class / Student Level <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={formData.classLevel}
                   onChange={(e) => handleChange('classLevel', e.target.value)}
                   onBlur={() => handleBlur('classLevel')}
-                  className="w-full text-xs sm:text-sm p-2.5 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full text-xs sm:text-sm p-3 rounded-xl glass-input bg-white/80 focus:outline-none cursor-pointer"
                 >
                   {CLASS_LEVELS.map((cl) => (
                     <option key={cl} value={cl}>
@@ -280,7 +287,7 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
 
             {/* Topic */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Lesson Topic <span className="text-rose-500">*</span>
               </label>
               <input
@@ -289,27 +296,28 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
                 value={formData.topic}
                 onChange={(e) => handleChange('topic', e.target.value)}
                 onBlur={() => handleBlur('topic')}
-                className={`w-full text-xs sm:text-sm p-2.5 rounded-lg border ${
+                className={`w-full text-xs sm:text-sm p-3 rounded-xl glass-input ${
                   errors.topic && touched.topic
-                    ? 'border-rose-400 bg-rose-50/30'
-                    : 'border-slate-300'
-                } focus:ring-2 focus:ring-indigo-500 focus:outline-none`}
+                    ? 'border-rose-400 bg-rose-50/40 focus:ring-rose-400'
+                    : ''
+                } focus:outline-none`}
               />
               {errors.topic && touched.topic && (
-                <p className="mt-1 text-[11px] text-rose-600 font-medium">
-                  {errors.topic}
+                <p className="mt-1.5 text-[11px] text-rose-600 font-medium flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  <span>{errors.topic}</span>
                 </p>
               )}
             </div>
 
             {/* Learning Objective */}
             <div>
-              <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-xs font-semibold text-slate-700">
                   Learning Objective <span className="text-rose-500">*</span>
                 </label>
-                <span className="text-[11px] text-slate-400">
-                  Specify measurable outcomes
+                <span className="text-[11px] text-slate-400 font-medium">
+                  Specify measurable outcomes (Bloom's taxonomy)
                 </span>
               </div>
               <textarea
@@ -318,27 +326,35 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
                 value={formData.learningObjective}
                 onChange={(e) => handleChange('learningObjective', e.target.value)}
                 onBlur={() => handleBlur('learningObjective')}
-                className={`w-full text-xs sm:text-sm p-3 rounded-lg border ${
+                className={`w-full text-xs sm:text-sm p-3.5 rounded-xl glass-input ${
                   errors.learningObjective && touched.learningObjective
-                    ? 'border-rose-400 bg-rose-50/30'
-                    : 'border-slate-300'
-                } focus:ring-2 focus:ring-indigo-500 focus:outline-none leading-relaxed`}
+                    ? 'border-rose-400 bg-rose-50/40 focus:ring-rose-400'
+                    : ''
+                } focus:outline-none leading-relaxed`}
               />
               {errors.learningObjective && touched.learningObjective && (
-                <p className="mt-1 text-[11px] text-rose-600 font-medium">
-                  {errors.learningObjective}
+                <p className="mt-1.5 text-[11px] text-rose-600 font-medium flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  <span>{errors.learningObjective}</span>
                 </p>
               )}
             </div>
           </div>
 
           {/* Card: Pedagogical Parameters */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-5">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <Layers className="w-4 h-4 text-indigo-600" />
-              <h3 className="text-sm font-bold text-slate-900">
-                2. Pedagogical Style & Delivery
-              </h3>
+          <div className="glass-panel rounded-3xl p-6 sm:p-7 space-y-5">
+            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200/70">
+              <div className="p-2 bg-indigo-50 rounded-xl text-indigo-700 shadow-subtle">
+                <Layers className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+                  2. Pedagogical Style & Delivery
+                </h3>
+                <p className="text-[11px] text-slate-500 font-medium">
+                  Tune duration, instructional modality, and difficulty
+                </p>
+              </div>
             </div>
 
             {/* Duration Buttons */}
@@ -352,10 +368,10 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
                     key={dur}
                     type="button"
                     onClick={() => handleChange('duration', dur)}
-                    className={`py-2 px-1 text-center rounded-lg text-xs font-medium border transition-all ${
+                    className={`py-2 px-1 text-center rounded-xl text-xs font-medium transition-all duration-150 ${
                       formData.duration === dur
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                        ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-300 border border-indigo-600'
+                        : 'bg-white/80 text-slate-700 border border-slate-200 hover:bg-white hover:border-slate-300'
                     }`}
                   >
                     {dur}
@@ -367,7 +383,7 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
             {/* Teaching Style & Difficulty */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Teaching Style
                 </label>
                 <select
@@ -375,7 +391,7 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
                   onChange={(e) =>
                     handleChange('teachingStyle', e.target.value as TeachingStyle)
                   }
-                  className="w-full text-xs sm:text-sm p-2.5 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full text-xs sm:text-sm p-3 rounded-xl glass-input bg-white/80 focus:outline-none cursor-pointer"
                 >
                   {TEACHING_STYLES.map((ts) => (
                     <option key={ts} value={ts}>
@@ -386,7 +402,7 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Difficulty Level
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -395,10 +411,10 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
                       key={diff}
                       type="button"
                       onClick={() => handleChange('difficulty', diff)}
-                      className={`py-2 px-2 text-center rounded-lg text-xs font-medium border transition-all ${
+                      className={`py-2 px-2 text-center rounded-xl text-xs font-medium transition-all duration-150 ${
                         formData.difficulty === diff
-                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                          ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-300 border border-indigo-600'
+                          : 'bg-white/80 text-slate-700 border border-slate-200 hover:bg-white hover:border-slate-300'
                       }`}
                     >
                       {diff}
@@ -410,7 +426,7 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
 
             {/* Language */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Instruction Language
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -419,10 +435,10 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
                     key={lang}
                     type="button"
                     onClick={() => handleChange('language', lang)}
-                    className={`py-2 px-3 text-center rounded-lg text-xs font-medium border transition-all ${
+                    className={`py-2 px-3 text-center rounded-xl text-xs font-medium transition-all duration-150 ${
                       formData.language === lang
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                        ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-300 border border-indigo-600'
+                        : 'bg-white/80 text-slate-700 border border-slate-200 hover:bg-white hover:border-slate-300'
                     }`}
                   >
                     {lang}
@@ -435,19 +451,21 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
 
         {/* Right 1 Col: Preview / Generation Blueprint */}
         <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <FileCheck2 className="w-4 h-4 text-indigo-600" />
-              <h3 className="text-sm font-bold text-slate-900">
+          <div className="glass-panel rounded-3xl p-6 space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-slate-200/70">
+              <div className="p-1.5 bg-indigo-50 rounded-lg text-indigo-700">
+                <FileCheck2 className="w-4 h-4" />
+              </div>
+              <h3 className="text-sm font-bold text-slate-900 tracking-tight">
                 Package Blueprint Preview
               </h3>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Your lesson package will be generated with these 8 complete, editable sections:
+            <p className="text-xs text-slate-600 leading-relaxed font-normal">
+              Your lesson package will be synthesized with these 8 complete, editable sections:
             </p>
 
-            <ul className="space-y-2 text-xs text-slate-700">
+            <ul className="space-y-2 text-xs text-slate-700 font-medium">
               {[
                 '1. Introduction with curiosity hook',
                 '2. Measurable Learning Objectives',
@@ -458,23 +476,23 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
                 '7. Multi-tier Assessment (MCQ & rubric)',
                 '8. Synthesis & Transition Conclusion'
               ].map((sec, i) => (
-                <li key={i} className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <li key={i} className="flex items-center gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>{sec}</span>
                 </li>
               ))}
             </ul>
 
-            <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div className="pt-3 border-t border-slate-200/70 text-[11px] text-slate-500 space-y-1">
               <p>• Every section can be regenerated individually.</p>
               <p>• Printable teacher handout export ready.</p>
             </div>
           </div>
 
-          {/* Primary CTA */}
-          <div className="bg-slate-900 rounded-xl p-5 text-white shadow-card space-y-3">
-            <h4 className="text-sm font-bold">Ready to Generate?</h4>
-            <p className="text-xs text-slate-300">
+          {/* Primary CTA Box with Subtle Dark Gradient Glass */}
+          <div className="rounded-3xl p-6 bg-slate-900/95 backdrop-blur-xl border border-white/10 text-white shadow-card space-y-3.5">
+            <h4 className="text-sm font-bold tracking-tight">Ready to Generate?</h4>
+            <p className="text-xs text-slate-300 leading-relaxed">
               Generative AI will construct your tailored classroom package based on your configured parameters.
             </p>
 
@@ -482,7 +500,7 @@ export const CreateLessonForm: React.FC<CreateLessonFormProps> = ({
               type="submit"
               variant="primary"
               size="lg"
-              className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold"
+              className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-glow"
               isLoading={isGenerating}
               leftIcon={<Sparkles className="w-4 h-4 text-white" />}
             >

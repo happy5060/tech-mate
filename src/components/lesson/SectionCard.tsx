@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit2, RefreshCw, Check, X } from 'lucide-react';
+import { Edit2, Sparkles, Check, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 interface SectionCardProps {
@@ -38,20 +38,22 @@ export const SectionCard: React.FC<SectionCardProps> = ({
   return (
     <div
       id={id}
-      className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden print-card transition-all"
+      className={`glass-panel rounded-2xl overflow-hidden print-card transition-all duration-200 ${
+        isEditing ? 'ring-2 ring-indigo-500/50 shadow-glass-hover bg-white/95' : 'hover:shadow-glass'
+      }`}
     >
       {/* Header */}
-      <div className="p-4 sm:p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/70">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-indigo-50 text-indigo-700 rounded-lg shrink-0">
+      <div className="p-4 sm:p-5 border-b border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/50 backdrop-blur-xs">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-700 shadow-subtle shrink-0">
             {icon}
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900 tracking-tight">
+            <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
               {sectionNumber}. {title}
             </h3>
             {description && (
-              <p className="text-xs text-slate-500">{description}</p>
+              <p className="text-xs text-slate-500 font-medium">{description}</p>
             )}
           </div>
         </div>
@@ -65,21 +67,22 @@ export const SectionCard: React.FC<SectionCardProps> = ({
                   size="sm"
                   onClick={onStartEdit}
                   leftIcon={<Edit2 className="w-3.5 h-3.5" />}
+                  className="rounded-xl"
                 >
                   Edit
                 </Button>
                 <div className="relative group">
                   <Button
-                    variant="ghost"
+                    variant="glass"
                     size="sm"
                     onClick={onRegenerate}
                     isLoading={isRegenerating}
-                    leftIcon={<RefreshCw className="w-3.5 h-3.5 text-indigo-600" />}
-                    className="border border-slate-200"
+                    leftIcon={<Sparkles className="w-3.5 h-3.5 text-indigo-600" />}
+                    className="rounded-xl border border-indigo-200/60 text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50/80"
                   >
                     Regenerate
                   </Button>
-                  <span className="pointer-events-none absolute -top-8 right-0 z-20 hidden group-hover:block whitespace-nowrap bg-slate-900 text-white text-[10px] px-2 py-1 rounded shadow-md">
+                  <span className="pointer-events-none absolute -top-8 right-0 z-20 hidden group-hover:block whitespace-nowrap bg-slate-900/90 backdrop-blur-md text-white text-[10px] px-2.5 py-1 rounded-lg shadow-md border border-white/10">
                     Regenerates ONLY {title}
                   </span>
                 </div>
@@ -91,6 +94,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
                   size="sm"
                   onClick={onCancelEdit}
                   leftIcon={<X className="w-3.5 h-3.5" />}
+                  className="rounded-xl"
                 >
                   Cancel
                 </Button>
@@ -99,6 +103,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
                   size="sm"
                   onClick={onSaveEdit}
                   leftIcon={<Check className="w-3.5 h-3.5" />}
+                  className="rounded-xl"
                 >
                   Save Section
                 </Button>
@@ -109,7 +114,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
       </div>
 
       {/* Body */}
-      <div className="p-4 sm:p-6 text-sm text-slate-700 leading-relaxed">
+      <div className="p-5 sm:p-6 text-xs sm:text-sm text-slate-700 leading-relaxed">
         {isEditing ? editForm : children}
       </div>
     </div>

@@ -86,10 +86,12 @@ export async function callGeminiJson<T = any>(
         return parsed;
       } catch (err: any) {
         lastError = err;
-        if (err.message && (err.message.includes('404') || err.message.includes('503') || err.message.includes('429'))) {
-          break; // Next candidate
+        console.warn(`[callGeminiJson] Candidate ${model} attempt ${attempt} warning:`, err.message || err);
+        if (attempt === 0) {
+          await new Promise((r) => setTimeout(r, 600));
+          continue;
         }
-        throw err;
+        break; // Proceed to next candidate model
       }
     }
   }

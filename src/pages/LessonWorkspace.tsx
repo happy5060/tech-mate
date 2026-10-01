@@ -168,20 +168,20 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
 
   return (
     <div className="space-y-6">
-      {/* Top Workspace Header (Sticky Bar) */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4 no-print sticky top-16 z-20 backdrop-blur-md bg-white/95">
+      {/* Top Workspace Header (Sticky Glass Bar) */}
+      <div className="glass-card bg-white/80 backdrop-blur-xl rounded-2xl border border-white/60 p-4 sm:p-5 shadow-glass space-y-4 no-print sticky top-16 z-20 transition-all duration-300">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5 flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <Link
                 to="/history"
-                className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 shrink-0"
+                className="text-xs font-semibold text-slate-500 hover:text-indigo-600 flex items-center gap-1 shrink-0 transition-colors"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>History</span>
               </Link>
               <span className="text-slate-300">/</span>
-              <span className="text-xs font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
+              <span className="text-xs font-semibold text-indigo-700 bg-indigo-50/80 px-2.5 py-0.5 rounded-full border border-indigo-200/60 shadow-xs">
                 Workspace & Editor
               </span>
             </div>
@@ -216,7 +216,7 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
               >
                 {lesson.difficulty}
               </Badge>
-              <span className="text-[11px] text-slate-400 pl-1">
+              <span className="text-[11px] text-slate-400 pl-1 font-medium">
                 Language: {lesson.language} · Style: {lesson.teachingStyle}
               </span>
             </div>
@@ -225,8 +225,8 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
           {/* Action Buttons */}
           <div className="flex items-center gap-2 shrink-0">
             {lastSaved && (
-              <span className="text-[11px] text-slate-400 hidden lg:inline-block mr-1">
-                Saved at {lastSaved}
+              <span className="text-[11px] text-slate-400 hidden lg:inline-block mr-1 font-mono">
+                Saved {lastSaved}
               </span>
             )}
 
@@ -236,6 +236,7 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
                 size="sm"
                 leftIcon={<Eye className="w-3.5 h-3.5" />}
                 title="Preview read-only lesson format"
+                className="bg-white/60 hover:bg-white border-slate-200/80 shadow-xs"
               >
                 View
               </Button>
@@ -247,25 +248,26 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
                 size="sm"
                 onClick={handleExportPrint}
                 leftIcon={<Printer className="w-3.5 h-3.5" />}
+                className="bg-white/60 hover:bg-white border-slate-200/80 shadow-xs"
               >
                 Export
               </Button>
-              <div className="absolute right-0 top-full mt-1 hidden group-hover:flex flex-col bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-30 w-44">
+              <div className="absolute right-0 top-full mt-1.5 hidden group-hover:flex flex-col bg-white/95 backdrop-blur-xl border border-white/60 rounded-xl shadow-glass py-1.5 z-30 w-48 animate-in fade-in zoom-in-95">
                 <button
                   type="button"
                   onClick={handleExportPrint}
-                  className="px-3 py-1.5 text-xs text-left text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                  className="px-3.5 py-2 text-xs text-left text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/50 flex items-center gap-2.5 transition-colors"
                 >
-                  <Printer className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Print Handout (PDF)</span>
+                  <Printer className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600" />
+                  <span className="font-medium">Print Handout (PDF)</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleExportJson}
-                  className="px-3 py-1.5 text-xs text-left text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                  className="px-3.5 py-2 text-xs text-left text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/50 flex items-center gap-2.5 transition-colors"
                 >
-                  <FileDown className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Download JSON</span>
+                  <FileDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600" />
+                  <span className="font-medium">Download JSON</span>
                 </button>
               </div>
             </div>
@@ -276,7 +278,7 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
               onClick={handleSaveWholeLesson}
               isLoading={isSaving}
               leftIcon={<Save className="w-3.5 h-3.5" />}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+              className="shadow-md shadow-indigo-500/20 active:scale-95"
             >
               Save Lesson
             </Button>
@@ -898,29 +900,30 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
             />
 
             {/* Quick Section Jump Navigator */}
-            <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2.5">
-                Section Navigator
+            <div className="glass-card rounded-2xl border border-white/60 bg-white/75 backdrop-blur-xl p-4 shadow-glass">
+              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2.5 flex items-center justify-between">
+                <span>Section Navigator</span>
+                <span className="text-[10px] font-medium text-slate-400 font-mono">8 Modules</span>
               </h4>
               <nav className="space-y-1 text-xs">
                 {[
-                  { key: 'introduction', label: '1. Introduction' },
+                  { key: 'introduction', label: '1. Introduction & Hook' },
                   { key: 'learningObjectives', label: '2. Learning Objectives' },
-                  { key: 'conceptExplanation', label: '3. Concept Explanation' },
+                  { key: 'conceptExplanation', label: '3. Concept Breakdown' },
                   { key: 'examples', label: '4. Case Examples' },
                   { key: 'classroomActivity', label: '5. Hands-on Activity' },
                   { key: 'discussionQuestions', label: '6. Discussion Questions' },
-                  { key: 'assessment', label: '7. Assessment (MCQ & Rubric)' },
-                  { key: 'conclusion', label: '8. Conclusion' }
+                  { key: 'assessment', label: '7. Assessment & Rubric' },
+                  { key: 'conclusion', label: '8. Conclusion & Wrap-up' }
                 ].map((s) => (
                   <button
                     key={s.key}
                     type="button"
                     onClick={() => scrollToSection(s.key)}
-                    className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-50 text-slate-600 hover:text-indigo-600 transition-colors flex items-center justify-between"
+                    className="w-full text-left px-3 py-2 rounded-xl hover:bg-indigo-50/50 text-slate-600 hover:text-indigo-600 transition-all flex items-center justify-between group cursor-pointer"
                   >
-                    <span>{s.label}</span>
-                    <span className="text-[10px] text-slate-400">Jump →</span>
+                    <span className="font-medium">{s.label}</span>
+                    <span className="text-[10px] text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-transform">→</span>
                   </button>
                 ))}
               </nav>
@@ -931,7 +934,7 @@ export const LessonWorkspace: React.FC<LessonWorkspaceProps> = ({ onLessonUpdate
 
       {/* Floating Save Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-modal text-xs font-medium animate-in slide-in-from-bottom-2">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-slate-900/90 text-white px-4 py-3 rounded-2xl shadow-glass backdrop-blur-xl border border-slate-700/60 text-xs font-medium animate-in slide-in-from-bottom-3 duration-300">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>

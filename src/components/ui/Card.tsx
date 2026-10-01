@@ -5,6 +5,7 @@ interface CardProps {
   className?: string;
   onClick?: () => void;
   hoverEffect?: boolean;
+  variant?: 'glass' | 'solid' | 'subtle';
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -12,14 +13,19 @@ export const Card: React.FC<CardProps> = ({
   className = '',
   onClick,
   hoverEffect = false,
+  variant = 'glass',
 }) => {
+  const variantStyles = {
+    glass: 'glass-card',
+    solid: 'bg-white border border-slate-200 shadow-card',
+    subtle: 'bg-slate-50/70 border border-slate-200/60 backdrop-blur-sm',
+  };
+
   return (
     <div
       onClick={onClick}
-      className={`bg-white rounded-xl border border-slate-200 shadow-sm ${
-        hoverEffect
-          ? 'transition-all duration-200 hover:shadow-card-hover hover:border-slate-300 cursor-pointer'
-          : ''
+      className={`rounded-2xl ${variantStyles[variant]} ${
+        hoverEffect ? 'glass-card-hover cursor-pointer' : ''
       } ${className}`}
     >
       {children}

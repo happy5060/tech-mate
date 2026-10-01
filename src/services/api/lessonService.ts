@@ -8,7 +8,7 @@ import {
   LessonContent
 } from '../../types/lesson';
 import { INITIAL_MOCK_LESSONS } from '../../data/mockLessons';
-import { supabase, invokeEdgeFunction } from './supabaseClient';
+import { supabase, invokeEdgeFunction, isSupabaseConfigured } from './supabaseClient';
 
 const LOCAL_STORAGE_KEY = 'ai_classroom_lessons_v1';
 
@@ -342,7 +342,13 @@ export const lessonService = {
     }
 
     const now = new Date().toISOString();
-    const id = `lesson-${Date.now()}`;
+    const id = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === 'x' ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
 
     // Convert raw JSON to lesson format
     const content: LessonContent = {
@@ -503,16 +509,37 @@ export const lessonService = {
    * Delete a lesson from Supabase and cache
    */
   async deleteLesson(id: string): Promise<void> {
+    if (!id || typeof id !== 'string') {
+      throw new Error('Invalid lesson ID provided for deletion');
+    }
+
+    const isStandardUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+    let dbError: any = null;
+
+    // Delete from Supabase if configured and ID matches schema UUID type
+    if (isStandardUuid && isSupabaseConfigured) {
+      try {
+        const { error } = await supabase.from('lessons').delete().eq('id', id);
+        if (error) {
+          dbError = error;
+          console.error(`[lessonService.deleteLesson] Supabase error deleting ID "${id}":`, error);
+        } else {
+          console.log(`[lessonService.deleteLesson] Database record "${id}" deleted successfully from Supabase.`);
+        }
+      } catch (err: any) {
+        dbError = err;
+        console.warn(`[lessonService.deleteLesson] Network/timeout deleting from Supabase:`, err);
+      }
+    }
+
+    // If Supabase returned an actual database error (e.g. RLS policy violation), throw error
+    if (dbError && dbError.code && dbError.code !== 'UND_ERR_CONNECT_TIMEOUT' && dbError.message && !dbError.message.includes('fetch failed')) {
+      throw new Error(dbError.message || 'Database error occurred while deleting lesson from Supabase');
+    }
+
     // Delete from local cache
     const cached = getLocalCache().filter((l) => l.id !== id);
     saveLocalCache(cached);
-
-    // Delete from Supabase
-    try {
-      await supabase.from('lessons').delete().eq('id', id);
-    } catch (err) {
-      console.warn('Supabase delete error:', err);
-    }
   },
 
   /**

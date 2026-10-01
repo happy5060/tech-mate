@@ -50,25 +50,25 @@ export const CreateLesson: React.FC<CreateLessonProps> = ({ onLessonCreated }) =
       <div className="flex items-center justify-between">
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-indigo-600 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Dashboard</span>
         </Link>
 
-        <span className="text-xs text-slate-400">Step 1 of 2: Configure Parameters</span>
+        <span className="text-xs text-slate-400 font-medium">Step 1 of 2: Configure Parameters</span>
       </div>
 
       {/* Header Info */}
-      <div className="space-y-1.5">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold">
-          <Sparkles className="w-3.5 h-3.5" />
+      <div className="space-y-2">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50/80 border border-indigo-200/60 text-indigo-700 text-[11px] font-bold shadow-xs">
+          <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
           <span>Generative Curriculum Architect</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           Create New Classroom Lesson
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 max-w-2xl">
+        <p className="text-xs sm:text-sm text-slate-500 max-w-2xl font-medium leading-relaxed">
           Provide your pedagogical requirements below. Our model will synthesize an aligned 8-section classroom lesson package with exercises, activities, and rubrics.
         </p>
       </div>
